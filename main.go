@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,12 +21,27 @@ func checkPort() string {
 func main() {
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"name":    "devhulk tpl",
-			"version": "0",
-		})
+	db, err := initDB()
+
+	if err != nil {
+		log.Fatalln("DB Connection Failed")
+	}
+
+	defer db.Close()
+
+	app.Get("/", root)
+	app.Get("/list", func(c *fiber.Ctx) error {
+		return list(c, db)
+	})
+	app.Post("/create", func(c *fiber.Ctx) error {
+		return create(c, db)
+	})
+	app.Put("/update/:id", func(c *fiber.Ctx) error {
+		return update(c, db)
+	})
+	app.Delete("/remove/:id", func(c *fiber.Ctx) error {
+		return remove(c, db)
 	})
 
-	app.Listen(checkPort())
+	log.Fatalln(app.Listen(checkPort()))
 }
