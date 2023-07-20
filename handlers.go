@@ -8,21 +8,35 @@ import (
 )
 
 type Task struct {
-	ID          string `json:"id,omitempty"`
+	ID          int    `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Status      bool   `json:"status"`
 }
 
-func root(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"root": true,
-	})
-}
-
 func create(c *fiber.Ctx, db *sql.DB) error {
+
+	var task Task
+
+	if err := c.BodyParser(&task); err != nil {
+		log.Fatalln("Error parsing insert response body.", err)
+	}
+
+	insert := `
+	INSERT INTO tasks (id, title, description, status)
+	VALUES ($1, $2, $3, $4)
+	`
+
+	_, err2 := db.Exec(insert, task.ID, task.Title, task.Description, task.Status)
+	if err2 != nil {
+		log.Fatalln("Error executing insert", err2)
+		return c.JSON(fiber.Map{
+			"error": "Could not insert. Try a unique id.",
+		})
+	}
+
 	return c.JSON(fiber.Map{
-		"name": "create stuff here",
+		"message": "new task created successfully",
 	})
 }
 

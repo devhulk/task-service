@@ -29,8 +29,7 @@ func main() {
 
 	defer db.Close()
 
-	app.Get("/", root)
-	app.Get("/list", func(c *fiber.Ctx) error {
+	app.Get("/", func(c *fiber.Ctx) error {
 		return list(c, db)
 	})
 	app.Post("/create", func(c *fiber.Ctx) error {
