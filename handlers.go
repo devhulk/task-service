@@ -44,7 +44,7 @@ func list(c *fiber.Ctx, db *sql.DB) error {
 	var task Task
 	var tasks []Task
 
-	rows, err := db.Query("SELECT title, description, status FROM tasks")
+	rows, err := db.Query("SELECT id, title, description, status FROM tasks")
 	defer rows.Close()
 
 	if err != nil {
@@ -53,7 +53,7 @@ func list(c *fiber.Ctx, db *sql.DB) error {
 	}
 
 	for rows.Next() {
-		rows.Scan(&task.Title, &task.Description, &task.Status)
+		rows.Scan(&task.ID, &task.Title, &task.Description, &task.Status)
 		tasks = append(tasks, task)
 	}
 
