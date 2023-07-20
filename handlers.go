@@ -5,10 +5,11 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type Task struct {
-	ID          int    `json:"id"`
+	ID          string `json:"id,omitempty"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Status      bool   `json:"status"`
@@ -22,12 +23,18 @@ func create(c *fiber.Ctx, db *sql.DB) error {
 		log.Fatalln("Error parsing insert response body.", err)
 	}
 
+	id, err1 := uuid.NewRandom()
+	if err1 != nil {
+		log.Fatalln("Could not create uuid.", err1)
+
+	}
+
 	insert := `
 	INSERT INTO tasks (id, title, description, status)
 	VALUES ($1, $2, $3, $4)
 	`
 
-	_, err2 := db.Exec(insert, task.ID, task.Title, task.Description, task.Status)
+	_, err2 := db.Exec(insert, id.String(), task.Title, task.Description, task.Status)
 	if err2 != nil {
 		log.Fatalln("Error executing insert", err2)
 		return c.JSON(fiber.Map{
@@ -37,6 +44,7 @@ func create(c *fiber.Ctx, db *sql.DB) error {
 
 	return c.JSON(fiber.Map{
 		"message": "new task created successfully",
+		"id":      id.String(),
 	})
 }
 
