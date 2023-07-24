@@ -70,13 +70,47 @@ func list(c *fiber.Ctx, db *sql.DB) error {
 }
 
 func update(c *fiber.Ctx, db *sql.DB) error {
+
+	var task Task
+
+	if err := c.BodyParser(&task); err != nil {
+		log.Fatalln("Error parsing insert response body.", err)
+	}
+
+	remove := `
+	UPDATE tasks
+	SET title = $2, description = $3 , status = $4
+	WHERE id = $1;
+	`
+
+	_, err2 := db.Exec(remove, c.Params("id"), task.Title, task.Description, task.Status)
+	if err2 != nil {
+		log.Fatalln("Error executing insert", err2)
+		return c.JSON(fiber.Map{
+			"error": "Could not delete task.",
+		})
+	}
 	return c.JSON(fiber.Map{
-		"name": "update stuff here",
+		"message": "Task updated successfully",
 	})
 }
 
 func remove(c *fiber.Ctx, db *sql.DB) error {
+
+	remove := `
+	DELETE FROM tasks
+	WHERE id = $1;
+	`
+
+	_, err2 := db.Exec(remove, c.Params("id"))
+	if err2 != nil {
+		log.Fatalln("Error executing insert", err2)
+		return c.JSON(fiber.Map{
+			"error": "Could not delete task.",
+		})
+	}
+
 	return c.JSON(fiber.Map{
-		"name": "delete stuff here",
+		"message": "Task deleted successfully",
 	})
 }
