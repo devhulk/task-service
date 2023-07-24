@@ -69,6 +69,25 @@ func list(c *fiber.Ctx, db *sql.DB) error {
 
 }
 
+func getTask(c *fiber.Ctx, db *sql.DB) error {
+	var task Task
+
+	rows, err := db.Query("SELECT id, title, description, status FROM tasks WHERE id = $1", c.Params("id"))
+	defer rows.Close()
+
+	if err != nil {
+		log.Fatalln(err)
+		c.JSON("Error occured reading database.")
+	}
+
+	for rows.Next() {
+		rows.Scan(&task.ID, &task.Title, &task.Description, &task.Status)
+	}
+
+	return c.JSON(task)
+
+}
+
 func update(c *fiber.Ctx, db *sql.DB) error {
 
 	var task Task

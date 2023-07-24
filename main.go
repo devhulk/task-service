@@ -34,6 +34,10 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return list(c, db)
 	})
+
+	app.Get("/:id", func(c *fiber.Ctx) error {
+		return getTask(c, db)
+	})
 	app.Post("/create", func(c *fiber.Ctx) error {
 		return create(c, db)
 	})
