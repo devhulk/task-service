@@ -109,6 +109,7 @@ func update(c *fiber.Ctx, db *sql.DB) error {
 			"error": "Could not delete task.",
 		})
 	}
+
 	return c.JSON(fiber.Map{
 		"message": "Task updated successfully",
 	})
